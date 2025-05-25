@@ -42,7 +42,7 @@ A full-stack application that automatically transcribes lecture videos and gener
 
 ### 1. Clone Repository
 \`\`\`bash
-git clone <repository-url>
+git clone (https://github.com/themohesh/Annam-ai.git)
 cd video-transcription-mcq-generator
 \`\`\`
 

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// This would integrate with your Python LLM service
+
 export async function POST(request: NextRequest) {
   try {
     const { segments, jobId } = await request.json()
