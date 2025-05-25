@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: video_transcription_db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: video_transcription
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ai-services:
+    build: ./python-services
+    container_name: ai_services
+    restart: unless-stopped
+    ports:
+      - "5000:5000" # Transcription service
+      - "5001:5001" # Question generation service
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://admin:password123@mongodb:27017/video_transcription?authSource=admin
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_llm
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+volumes:
+  mongodb_data:
+  ollama_data:
